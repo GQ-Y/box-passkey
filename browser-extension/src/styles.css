@@ -1,0 +1,180 @@
+/* 网盘链接按钮的通用样式 */
+.netdisk-link-button {
+  display: inline-block;
+  margin: 5px;
+  padding: 8px 15px;
+  background-color: #2196F3;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.netdisk-link-button:hover {
+  background-color: #0b7dda;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.netdisk-link-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.netdisk-link-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: all 0.6s;
+}
+
+.netdisk-link-button:hover::before {
+  left: 100%;
+}
+
+/* 不同网盘类型的按钮样式 */
+.netdisk-link-button.baidu {
+  background: linear-gradient(135deg, #2196F3, #0d47a1);
+}
+
+.netdisk-link-button.aliyun {
+  background: linear-gradient(135deg, #FF5722, #c41d00);
+}
+
+.netdisk-link-button.quark {
+  background: linear-gradient(135deg, #00C250, #007e33);
+}
+
+.netdisk-link-button.lanzou {
+  background: linear-gradient(135deg, #9C27B0, #6a0080);
+}
+
+.netdisk-link-button.generic {
+  background: linear-gradient(135deg, #4CAF50, #2e7d32);
+}
+
+/* 按钮禁用状态 */
+.netdisk-link-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* 提示信息样式 */
+.netdisk-tooltip {
+  position: absolute;
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+  max-width: 200px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 网盘链接容器 */
+.netdisk-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 5px 0;
+  position: relative;
+}
+
+/* 对于内联显示的容器 */
+.netdisk-container.inline {
+  display: inline-block;
+  margin: 0 5px;
+  vertical-align: middle;
+}
+
+/* 积分信息显示 */
+.netdisk-points-info {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+  background-color: rgba(245, 245, 245, 0.8);
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* 带图标的按钮样式 */
+.netdisk-link-button.with-icon {
+  padding-left: 35px;
+}
+
+.netdisk-button-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* 网盘图标样式 */
+.netdisk-button-icon.baidu-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M4.5,6C3.1,6,2,7.1,2,8.5S3.1,11,4.5,11S7,9.9,7,8.5S5.9,6,4.5,6z M11.5,6C10.1,6,9,7.1,9,8.5s1.1,2.5,2.5,2.5s2.5-1.1,2.5-2.5S12.9,6,11.5,6z M4.5,2C2,2,0,4,0,6.5c0,1.8,0.8,3.4,2.1,4.5c1,0.8,2.3,1.5,3.9,1.5s2.9-0.7,3.9-1.5c1.3-1.1,2.1-2.7,2.1-4.5C12,4,10,2,7.5,2H4.5z M11.5,2c-1.5,0-2.7,0.8-3.5,2c0.8,1.2,2,2,3.5,2c1.9,0,3.5,1.6,3.5,3.5S13.4,13,11.5,13c-1.2,0-2.3-0.6-2.9-1.6C7.8,12.4,6.7,13,5.5,13C3.6,13,2,11.4,2,9.5S3.6,6,5.5,6c0.8,0,1.5,0.3,2.1,0.7C8.2,4.3,9.7,2,11.5,2z'/%3E%3C/svg%3E");
+}
+
+.netdisk-button-icon.aliyun-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.8,8.5c0-0.2,0-0.3,0-0.5c0-3.3-2.7-6-6-6S1.8,4.7,1.8,8c0,0.2,0,0.3,0,0.5C0.7,9,0,10.2,0,11.5C0,13.4,1.6,15,3.5,15c1,0,1.9-0.4,2.5-1.1C6.6,14,7.3,14.1,8,14.1s1.4-0.1,2-0.2c0.6,0.7,1.5,1.1,2.5,1.1c1.9,0,3.5-1.6,3.5-3.5C16,10.2,15.3,9,13.8,8.5z M3.5,13C2.7,13,2,12.3,2,11.5S2.7,10,3.5,10c0.2,0,0.4,0,0.5,0.1c0.1,0.5,0.3,1,0.5,1.4C4.3,12.2,4,12.6,3.5,13z M8,12.1c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S10.2,12.1,8,12.1z M12.5,13c-0.5,0-0.8-0.4-1-1c0.2-0.4,0.4-0.9,0.5-1.4c0.2-0.1,0.3-0.1,0.5-0.1c0.8,0,1.5,0.7,1.5,1.5S13.3,13,12.5,13z'/%3E%3C/svg%3E");
+}
+
+.netdisk-button-icon.quark-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M8,2L2,5v6l6,3l6-3V5L8,2z M8,4l3,1.5L8,7L5,5.5L8,4z M4,6.7l3,1.5v3l-3-1.5V6.7z M9,11.2v-3l3-1.5v3L9,11.2z'/%3E%3C/svg%3E");
+}
+
+.netdisk-button-icon.lanzou-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13,7.2V3.5C13,2.7,12.3,2,11.5,2h-7C3.7,2,3,2.7,3,3.5v3.7C1.8,8,1,9.3,1,10.8C1,13,2.8,14.8,5,14.8c1.1,0,2.1-0.4,2.8-1.2c0.1,0,0.1,0,0.2,0c0.1,0,0.1,0,0.2,0c0.7,0.7,1.7,1.2,2.8,1.2c2.2,0,4-1.8,4-4C15,9.3,14.2,8,13,7.2z M5,12.8c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S6.1,12.8,5,12.8z M8,7.5C8,6.7,7.3,6,6.5,6h-2C4.2,6,4,5.8,4,5.5V4.5C4,4.2,4.2,4,4.5,4h7C11.8,4,12,4.2,12,4.5v1c0,0.3-0.2,0.5-0.5,0.5h-2C8.7,6,8,6.7,8,7.5V8C8,7.9,8,7.7,8,7.5z M11,12.8c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S12.1,12.8,11,12.8z'/%3E%3C/svg%3E");
+}
+
+.netdisk-button-icon.generic-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13,2H9.4C9,0.8,7.8,0,6.5,0S4,0.8,3.6,2H3C1.3,2,0,3.3,0,5v8c0,1.7,1.3,3,3,3h10c1.7,0,3-1.3,3-3V5C16,3.3,14.7,2,13,2z M6.5,2C7.3,2,8,1.3,8,0.5S7.3-1,6.5-1S5-0.3,5,0.5S5.7,2,6.5,2z M14,13c0,0.6-0.4,1-1,1H3c-0.6,0-1-0.4-1-1V5c0-0.6,0.4-1,1-1h10c0.6,0,1,0.4,1,1V13z'/%3E%3C/svg%3E");
+}
+
+/* 加载动画 */
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 加载中按钮样式 */
+.netdisk-link-button.loading {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+.netdisk-link-button.loading::before {
+  left: -100%;
+  animation: none;
+} 

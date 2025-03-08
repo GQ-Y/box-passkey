@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网盘助手</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="../../assets/icon48.png" alt="网盘助手">
+        <h1>网盘助手</h1>
+      </div>
+      <div class="user-info">
+        <div id="login-status">
+          <div class="guest-view">
+            <button id="login-btn" class="btn primary-btn">登录</button>
+          </div>
+          <div class="user-view hidden">
+            <span id="username">加载中...</span>
+            <span class="points">积分: <span id="points-value">0</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="links">发现的链接</button>
+      <button class="tab-btn" data-tab="history">使用历史</button>
+      <button class="tab-btn" data-tab="settings">设置</button>
+    </div>
+
+    <div class="tab-content">
+      <!-- 发现的链接标签页 -->
+      <div id="links-tab" class="tab-pane active">
+        <div class="section-header">
+          <h2>本页面发现的网盘链接</h2>
+          <span class="refresh-btn" id="refresh-links">刷新</span>
+        </div>
+        <div class="links-list" id="found-links">
+          <div class="empty-state">
+            <p>暂未发现网盘链接</p>
+            <small>浏览包含网盘链接的网页后将自动收集</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 使用历史标签页 -->
+      <div id="history-tab" class="tab-pane">
+        <div class="section-header">
+          <h2>使用历史</h2>
+          <span class="refresh-btn" id="refresh-history">刷新</span>
+        </div>
+        <div class="history-list" id="history-links">
+          <div class="empty-state">
+            <p>暂无使用历史</p>
+            <small>使用网盘链接后将显示在这里</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置标签页 -->
+      <div id="settings-tab" class="tab-pane">
+        <div class="settings-group">
+          <h3>基本设置</h3>
+          <div class="setting-item">
+            <label for="auto-replace">
+              自动替换网盘链接
+              <small>将网页中的网盘链接替换为一键访问按钮</small>
+            </label>
+            <div class="toggle">
+              <input type="checkbox" id="auto-replace" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="auto-submit">
+              自动上传发现的链接
+              <small>将发现的网盘链接和密码分享给其他用户</small>
+            </label>
+            <div class="toggle">
+              <input type="checkbox" id="auto-submit" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="offline-mode">
+              离线模式
+              <small>直接访问网盘链接而不从服务器获取密码（不消耗积分）</small>
+            </label>
+            <div class="toggle">
+              <input type="checkbox" id="offline-mode">
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-group">
+          <h3>网盘类型</h3>
+          <div class="setting-item">
+            <label for="baidu-drive">百度网盘</label>
+            <div class="toggle">
+              <input type="checkbox" id="baidu-drive" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="aliyun-drive">阿里云盘</label>
+            <div class="toggle">
+              <input type="checkbox" id="aliyun-drive" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="quark-drive">夸克网盘</label>
+            <div class="toggle">
+              <input type="checkbox" id="quark-drive" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </div>
+        </div>
+        
+        <button id="save-settings" class="btn primary-btn">保存设置</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-links">
+        <a href="#" id="help-link">帮助</a>
+        <span class="separator">|</span>
+        <a href="#" id="feedback-link">反馈</a>
+        <span class="separator">|</span>
+        <a href="#" id="about-link">关于</a>
+      </div>
+      <div class="version">版本 1.0.0</div>
+    </footer>
+  </div>
+
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>登录</h2>
+      <div class="login-options">
+        <button id="github-login" class="btn oauth-btn">
+          <img src="../../assets/github-icon.png" alt="GitHub">
+          使用GitHub登录
+        </button>
+        <div class="separator-text"><span>或</span></div>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username-input">用户名</label>
+            <input type="text" id="username-input" required>
+          </div>
+          <div class="form-group">
+            <label for="password-input">密码</label>
+            <input type="password" id="password-input" required>
+          </div>
+          <button type="submit" class="btn primary-btn">登录</button>
+        </form>
+        <p class="register-link">
+          还没有账号？ <a href="#" id="register-link">注册</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html> 
