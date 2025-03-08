@@ -539,6 +539,12 @@ async function handleButtonClick(event) {
       
       // 直接跳转到网盘页面，不消耗积分
       openNetDiskWithPassword(url, password);
+      
+      // 设置一个超时，确保按钮状态能够恢复
+      setTimeout(() => {
+        resetAllRelatedButtons(url, normalizedUrl);
+      }, 2000);
+      
       return;
     }
     
@@ -553,18 +559,22 @@ async function handleButtonClick(event) {
     button.innerHTML = `<span class="loading-spinner"></span> 获取密码中...`;
     button.disabled = true;
     
+    // 设置一个超时计时器，如果请求时间过长，自动恢复按钮状态
+    const buttonRecoveryTimeout = setTimeout(() => {
+      resetAllRelatedButtons(url, normalizedUrl);
+    }, 30000); // 30秒后自动恢复，避免按钮永久停留在加载状态
+    
     // 创建并显示中间跳转页面
     showTransitionPage(url, normalizedUrl);
+    
+    // 成功显示跳转页面后清除超时
+    clearTimeout(buttonRecoveryTimeout);
   } catch (error) {
     console.error('处理点击出错:', error);
     alert('操作失败，请稍后再试。');
     
     // 恢复按钮状态
-    const diskInfo = foundLinks.get(normalizedUrl) || foundLinks.get(url);
-    const icon = diskInfo ? `<span class="netdisk-button-icon ${diskInfo.type}-icon"></span>` : '';
-    button.classList.remove('loading');
-    button.innerHTML = `${icon}一键访问${diskInfo ? diskInfo.name : '网盘'}`;
-    button.disabled = false;
+    resetAllRelatedButtons(url, normalizedUrl);
   }
 }
 
@@ -657,17 +667,14 @@ function showTransitionPage(url, normalizedUrl) {
   
   // 取消按钮事件
   cancelButton.addEventListener('click', () => {
-    document.body.removeChild(overlay);
-    
     // 恢复所有按钮状态
-    const buttons = document.querySelectorAll(`button[data-url="${encodeURIComponent(url)}"]`);
-    buttons.forEach(button => {
-      const diskInfo = foundLinks.get(normalizedUrl) || foundLinks.get(url);
-      const icon = diskInfo ? `<span class="netdisk-button-icon ${diskInfo.type}-icon"></span>` : '';
-      button.classList.remove('loading');
-      button.innerHTML = `${icon}一键访问${diskInfo ? diskInfo.name : '网盘'}`;
-      button.disabled = false;
-    });
+    resetAllRelatedButtons(url, normalizedUrl);
+    
+    try {
+      document.body.removeChild(overlay);
+    } catch (e) {
+      console.log('遮罩已被移除');
+    }
   });
   
   // 调用API获取密码
@@ -692,18 +699,32 @@ async function getPasswordAndRedirect(url, normalizedUrl, overlay, statusElement
       // 消耗积分
       await consumePoints();
       
+      // 先恢复页面上所有相关按钮状态
+      resetAllRelatedButtons(url, normalizedUrl);
+      
       // 延迟一会再跳转，让用户看到成功信息
       setTimeout(() => {
-        document.body.removeChild(overlay);
+        try {
+          document.body.removeChild(overlay);
+        } catch (e) {
+          console.log('遮罩已被移除');
+        }
         openNetDiskWithPassword(url, response.password);
       }, 1000);
     } else {
       // 更新状态
       statusElement.textContent = '未找到此链接的密码，即将跳转到网盘页面...';
       
+      // 先恢复页面上所有相关按钮状态
+      resetAllRelatedButtons(url, normalizedUrl);
+      
       // 延迟跳转
       setTimeout(() => {
-        document.body.removeChild(overlay);
+        try {
+          document.body.removeChild(overlay);
+        } catch (e) {
+          console.log('遮罩已被移除');
+        }
         window.open(url, '_blank');
       }, 1500);
     }
@@ -754,9 +775,42 @@ async function getPasswordAndRedirect(url, normalizedUrl, overlay, statusElement
     
     // 直接访问按钮事件
     directButton.addEventListener('click', () => {
-      document.body.removeChild(overlay);
+      // 恢复所有按钮状态
+      resetAllRelatedButtons(url, normalizedUrl);
+      
+      try {
+        document.body.removeChild(overlay);
+      } catch (e) {
+        console.log('遮罩已被移除');
+      }
       window.open(url, '_blank');
     });
+  }
+}
+
+/**
+ * 重置页面上所有与指定URL相关的按钮状态
+ */
+function resetAllRelatedButtons(url, normalizedUrl) {
+  try {
+    // 查找所有相关按钮并重置状态
+    const encodedUrl = encodeURIComponent(url);
+    const buttons = document.querySelectorAll(`button[data-url="${url}"], button[data-url="${encodedUrl}"]`);
+    
+    buttons.forEach(button => {
+      const diskInfo = foundLinks.get(normalizedUrl) || foundLinks.get(url);
+      const icon = diskInfo ? `<span class="netdisk-button-icon ${diskInfo.type}-icon"></span>` : '';
+      button.classList.remove('loading');
+      button.innerHTML = `${icon}一键访问${diskInfo ? diskInfo.name : '网盘'}`;
+      button.disabled = false;
+    });
+    
+    // 特殊情况：处理浏览器关闭页面事件
+    window.addEventListener('beforeunload', function() {
+      resetAllRelatedButtons(url, normalizedUrl);
+    }, { once: true });
+  } catch (e) {
+    console.error('重置按钮状态出错:', e);
   }
 }
 
