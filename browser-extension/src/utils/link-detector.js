@@ -16,7 +16,10 @@ const NETDISK_PATTERNS = {
   },
   // 阿里云盘链接格式
   aliyun: {
-    pattern: /https?:\/\/www\.aliyundrive\.com\/s\/([a-zA-Z0-9_-]+)/,
+    // 标准链接格式：https://www.alipan.com/s/ABCdef1234 (提取码通常在URL旁边的文本中)
+    pattern: /https?:\/\/(?:www\.aliyundrive\.com|www\.alipan\.com)\/s\/([a-zA-Z0-9_-]+)(?:[?&]pwd=([a-zA-Z0-9]{4}))?/,
+    // 检测提取码的正则表达式 - 通常为"提取码"/"密码"/"访问码"后跟4个字符
+    passwordPattern: /(?:(?:提取|访问|密)?码[：:]\s*|[?&]pwd=\s*)([a-zA-Z0-9]{4})/i,
     name: '阿里云盘',
     type: 'aliyun'
   },
@@ -43,6 +46,14 @@ const NETDISK_PATTERNS = {
     pattern: /https?:\/\/pan\.quark\.cn\/s\/([a-zA-Z0-9_-]+)/,
     name: '夸克网盘',
     type: 'quark'
+  },
+  // 123盘链接格式
+  pan123: {
+    pattern: /https?:\/\/(?:www\.123pan\.com|www\.123684\.com)\/s\/([a-zA-Z0-9_-]+)(?:[?&](?:pwd|extraction-code)=([a-zA-Z0-9]{4}))?/,
+    // 检测提取码的正则表达式
+    passwordPattern: /(?:(?:提取|访问|密)?码[：:]\s*|[?&](?:pwd|extraction-code)=\s*)([a-zA-Z0-9]{4})/i,
+    name: '123盘',
+    type: 'pan123'
   }
   // 可以添加更多网盘类型
 };
@@ -89,9 +100,53 @@ function detectNetDiskLink(url) {
     }
   }
   
+  // 特殊处理阿里云盘链接
+  if (url.includes('alipan.com') || url.includes('aliyundrive.com')) {
+    const pattern = NETDISK_PATTERNS.aliyun.pattern;
+    if (pattern.test(url)) {
+      const match = url.match(pattern);
+      const result = {
+        type: NETDISK_PATTERNS.aliyun.type,
+        name: NETDISK_PATTERNS.aliyun.name,
+        url: url,
+        matched: match[0],
+        code: match[1]
+      };
+      
+      // 如果URL中包含提取码，直接提取
+      if (match[2]) {
+        result.password = match[2];
+      }
+      
+      return result;
+    }
+  }
+  
+  // 特殊处理123盘链接
+  if (url.includes('123pan.com') || url.includes('123684.com')) {
+    const pattern = NETDISK_PATTERNS.pan123.pattern;
+    if (pattern.test(url)) {
+      const match = url.match(pattern);
+      const result = {
+        type: NETDISK_PATTERNS.pan123.type,
+        name: NETDISK_PATTERNS.pan123.name,
+        url: url,
+        matched: match[0],
+        code: match[1]
+      };
+      
+      // 如果URL中包含提取码，直接提取
+      if (match[2]) {
+        result.password = match[2];
+      }
+      
+      return result;
+    }
+  }
+  
   // 检查其他网盘类型
   for (const [key, diskInfo] of Object.entries(NETDISK_PATTERNS)) {
-    if (key === 'baidu') continue; // 百度网盘已单独处理
+    if (key === 'baidu' || key === 'aliyun' || key === 'pan123') continue; // 已单独处理
     
     const pattern = diskInfo.pattern;
     if (pattern.test(url)) {
@@ -133,28 +188,85 @@ function extractNetDiskLinks(text) {
   // 提取百度网盘初始化格式链接
   const baiduInitPattern = new RegExp(NETDISK_PATTERNS.baidu.initPattern.source, 'g');
   while ((match = baiduInitPattern.exec(text)) !== null) {
-    const linkInfo = {
+    const link = {
       type: NETDISK_PATTERNS.baidu.type,
       name: NETDISK_PATTERNS.baidu.name,
       url: match[0],
       code: match[1]
     };
     
-    // 如果URL中包含提取码，直接提取
+    // 如果URL中包含提取码，记录下来
     if (match[2]) {
-      linkInfo.password = match[2];
+      link.password = match[2];
     }
     
-    links.push(linkInfo);
+    links.push(link);
+  }
+  
+  // 提取阿里云盘链接
+  const aliyunPattern = new RegExp(NETDISK_PATTERNS.aliyun.pattern.source, 'g');
+  while ((match = aliyunPattern.exec(text)) !== null) {
+    const link = {
+      type: NETDISK_PATTERNS.aliyun.type,
+      name: NETDISK_PATTERNS.aliyun.name,
+      url: match[0],
+      code: match[1]
+    };
+    
+    // 如果URL中包含提取码参数
+    if (match[2]) {
+      link.password = match[2];
+    } else {
+      // 尝试在文本中查找提取码
+      // 在链接所在位置的前后100个字符中查找
+      const startPos = Math.max(0, match.index - 100);
+      const endPos = Math.min(text.length, match.index + match[0].length + 100);
+      const surroundingText = text.substring(startPos, endPos);
+      
+      const pwdMatch = surroundingText.match(NETDISK_PATTERNS.aliyun.passwordPattern);
+      if (pwdMatch) {
+        link.password = pwdMatch[1];
+      }
+    }
+    
+    links.push(link);
+  }
+  
+  // 提取123盘链接
+  const pan123Pattern = new RegExp(NETDISK_PATTERNS.pan123.pattern.source, 'g');
+  while ((match = pan123Pattern.exec(text)) !== null) {
+    const link = {
+      type: NETDISK_PATTERNS.pan123.type,
+      name: NETDISK_PATTERNS.pan123.name,
+      url: match[0],
+      code: match[1]
+    };
+    
+    // 如果URL中包含提取码参数
+    if (match[2]) {
+      link.password = match[2];
+    } else {
+      // 尝试在文本中查找提取码
+      // 在链接所在位置的前后100个字符中查找
+      const startPos = Math.max(0, match.index - 100);
+      const endPos = Math.min(text.length, match.index + match[0].length + 100);
+      const surroundingText = text.substring(startPos, endPos);
+      
+      const pwdMatch = surroundingText.match(NETDISK_PATTERNS.pan123.passwordPattern);
+      if (pwdMatch) {
+        link.password = pwdMatch[1];
+      }
+    }
+    
+    links.push(link);
   }
   
   // 提取其他网盘链接
   for (const [key, diskInfo] of Object.entries(NETDISK_PATTERNS)) {
-    if (key === 'baidu') continue; // 百度网盘已单独处理
+    if (key === 'baidu' || key === 'aliyun' || key === 'pan123') continue; // 已单独处理
     
-    // 设置全局标志以找到所有匹配项
-    const globalPattern = new RegExp(diskInfo.pattern.source, 'g');
-    while ((match = globalPattern.exec(text)) !== null) {
+    const pattern = new RegExp(diskInfo.pattern.source, 'g');
+    while ((match = pattern.exec(text)) !== null) {
       links.push({
         type: diskInfo.type,
         name: diskInfo.name,

@@ -30,6 +30,7 @@ const defaultSettings = {
     aliyun: true,
     quark: true,
     lanzou: true,
+    pan123: true,
     generic: true
   }
 };
@@ -155,7 +156,21 @@ async function loadSettings() {
     
     if (data && data.settings) {
       // 合并默认设置和用户设置，确保所有必要的字段都存在
-      settings = {...defaultSettings, ...data.settings};
+      const userSettings = data.settings;
+      
+      // 兼容性处理，将旧的enabledPlatforms转换为新的enabledTypes
+      if (userSettings.enabledPlatforms && !userSettings.enabledTypes) {
+        userSettings.enabledTypes = {
+          baidu: userSettings.enabledPlatforms.baidu !== false,
+          aliyun: userSettings.enabledPlatforms.aliyun !== false,
+          quark: userSettings.enabledPlatforms.quark !== false,
+          lanzou: true,
+          pan123: userSettings.enabledPlatforms.pan123 !== false,
+          generic: true
+        };
+      }
+      
+      settings = {...defaultSettings, ...userSettings};
     }
   } catch (error) {
     console.error('加载设置失败:', error);
@@ -845,6 +860,22 @@ function openNetDiskWithPassword(url, password) {
     return;
   }
   
+  // 对于阿里云盘链接，直接添加密码参数
+  if ((url.includes('alipan.com/s/') || url.includes('aliyundrive.com/s/')) && !url.includes('pwd=')) {
+    const separator = url.includes('?') ? '&' : '?';
+    const urlWithPassword = `${url}${separator}pwd=${password}`;
+    window.open(urlWithPassword, '_blank');
+    return;
+  }
+  
+  // 对于123盘链接，直接添加密码参数
+  if ((url.includes('123pan.com/s/') || url.includes('123684.com/s/')) && !url.includes('pwd=')) {
+    const separator = url.includes('?') ? '&' : '?';
+    const urlWithPassword = `${url}${separator}pwd=${password}`;
+    window.open(urlWithPassword, '_blank');
+    return;
+  }
+  
   // 打开网盘链接并自动填充密码
   try {
     window.sendToBackground({
@@ -855,11 +886,18 @@ function openNetDiskWithPassword(url, password) {
           // 尝试适配不同网盘的密码输入框
           const inputSelectors = [
             '.input-box input',          // 百度网盘
+            'input[id*="password"]',     // 阿里云盘
+            'input[placeholder*="提取码"]', // 阿里云盘
+            'input.share-password',      // 阿里云盘新版
             '.aliyun-password-input',    // 阿里云盘
+            'input.pwd-input',           // 123盘
+            'input#pwd',                 // 123盘
+            'input[placeholder*="密码"]', // 123盘
+            'input[name="extraction-code"]', // 123盘
             '.weiyun-password-input',    // 腾讯微云
             '.quark-password-input',     // 夸克网盘
             'input.password-input',      // 夸克网盘
-            'input[placeholder*="密码"]',// 夸克网盘
+            'input[placeholder*="密码"]',// 多种网盘通用
             '#pwd-input',                // 通用选择器
             'input[type="password"]'     // 通用选择器
           ];
@@ -872,10 +910,20 @@ function openNetDiskWithPassword(url, password) {
           
           if (input) {
             input.value = '${password}';
+            // 触发输入事件以确保输入被识别
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
             
             // 尝试适配不同网盘的提交按钮
             const buttonSelectors = [
               '.input-box + .button',     // 百度网盘
+              'button[class*="submit"]',  // 阿里云盘
+              'button[class*="primary"]', // 阿里云盘新版
+              'button.share-confirm',     // 阿里云盘
+              '.pan123-submit-btn',       // 123盘
+              'button.ant-btn-primary',   // 123盘
+              'button[type="submit"]',    // 123盘
+              'button:not([disabled])',   // 通用选择器(非禁用按钮)
               '.aliyun-submit-button',    // 阿里云盘
               '.weiyun-submit-button',    // 腾讯微云
               '.quark-confirm-button',    // 夸克网盘

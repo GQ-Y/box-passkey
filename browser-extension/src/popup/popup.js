@@ -29,6 +29,7 @@ const elements = {
   baiduDrive: document.getElementById('baidu-drive'),
   aliyunDrive: document.getElementById('aliyun-drive'),
   quarkDrive: document.getElementById('quark-drive'),
+  pan123Drive: document.getElementById('pan123-drive'),
   saveSettings: document.getElementById('save-settings'),
   
   // 登录模态框
@@ -55,7 +56,9 @@ let settings = {
   autoSubmit: true,
   enabledPlatforms: {
     baidu: true,
-    aliyun: true
+    aliyun: true,
+    quark: true,
+    pan123: true
   }
 };
 
@@ -195,6 +198,7 @@ async function loadSettings() {
       elements.baiduDrive.checked = settings.enabledPlatforms && settings.enabledPlatforms.baidu !== false;
       elements.aliyunDrive.checked = settings.enabledPlatforms && settings.enabledPlatforms.aliyun !== false;
       elements.quarkDrive.checked = settings.enabledPlatforms && settings.enabledPlatforms.quark !== false;
+      elements.pan123Drive.checked = settings.enabledPlatforms && settings.enabledPlatforms.pan123 !== false;
     }
   } catch (error) {
     console.error('加载设置失败:', error);
@@ -206,7 +210,8 @@ async function loadSettings() {
       enabledPlatforms: {
         baidu: true,
         aliyun: true,
-        quark: true
+        quark: true,
+        pan123: true
       }
     };
     
@@ -217,6 +222,7 @@ async function loadSettings() {
     elements.baiduDrive.checked = true;
     elements.aliyunDrive.checked = true;
     elements.quarkDrive.checked = true;
+    elements.pan123Drive.checked = true;
   }
 }
 
@@ -570,7 +576,8 @@ async function saveSettings() {
     enabledPlatforms: {
       baidu: elements.baiduDrive.checked,
       aliyun: elements.aliyunDrive.checked,
-      quark: elements.quarkDrive.checked
+      quark: elements.quarkDrive.checked,
+      pan123: elements.pan123Drive.checked
     }
   };
   

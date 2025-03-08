@@ -14,6 +14,18 @@ const PASSWORD_PATTERNS = [
   // 提取形如 "code: abcd" 的密码
   /(?:code|验证|校验码)[：:]\s*([a-zA-Z0-9]{4})/i,
   
+  // 阿里云盘密码模式 - URL参数形式
+  /[?&]pwd=([a-zA-Z0-9]{4})/i,
+  
+  // 阿里云盘密码模式 - "链接xxx 提取码: abcd" 格式
+  /链接.*?提取码[：:]\s*([a-zA-Z0-9]{4})/i,
+  
+  // 123盘密码模式 - URL参数形式
+  /[?&](?:pwd|extraction-code)=([a-zA-Z0-9]{4})/i,
+  
+  // 123盘密码模式 - "123盘xxx 密码(code): abcd" 格式
+  /123盘.*?(?:提取码|密码|code)[：: ]\s*([a-zA-Z0-9]{4})/i,
+  
   // 提取形如 "abcd" 的纯4位密码（作为最后尝试，优先级最低）
   /\b([a-zA-Z0-9]{4})\b/
 ];
@@ -60,6 +72,12 @@ function findPasswordForLink(url, text, possiblePasswords = null) {
   // 如果只有一个密码，直接返回
   if (passwords.length === 1) return passwords[0];
   
+  // 检查URL是否为阿里云盘链接
+  const isAliyunLink = url.includes('alipan.com') || url.includes('aliyundrive.com');
+  
+  // 检查URL是否为123盘链接
+  const is123PanLink = url.includes('123pan.com') || url.includes('123684.com');
+  
   // 查找链接周围的文本（前后100个字符）
   const linkIndex = text.indexOf(url);
   if (linkIndex === -1) return passwords[0]; // 未找到链接，返回第一个密码
@@ -67,6 +85,36 @@ function findPasswordForLink(url, text, possiblePasswords = null) {
   const startIndex = Math.max(0, linkIndex - 100);
   const endIndex = Math.min(text.length, linkIndex + url.length + 100);
   const surroundingText = text.substring(startIndex, endIndex);
+  
+  // 如果是阿里云盘链接，优先检查特定的阿里云盘密码模式
+  if (isAliyunLink) {
+    // 首先检查URL中是否有pwd参数
+    const pwdParamMatch = url.match(/[?&]pwd=([a-zA-Z0-9]{4})/i);
+    if (pwdParamMatch && pwdParamMatch[1]) {
+      return pwdParamMatch[1];
+    }
+    
+    // 然后检查周围文本中的阿里云盘特定格式
+    const aliyunPwdMatch = surroundingText.match(/链接.*?提取码[：:]\s*([a-zA-Z0-9]{4})/i);
+    if (aliyunPwdMatch && aliyunPwdMatch[1]) {
+      return aliyunPwdMatch[1];
+    }
+  }
+  
+  // 如果是123盘链接，优先检查特定的123盘密码模式
+  if (is123PanLink) {
+    // 首先检查URL中是否有提取码参数
+    const pwdParamMatch = url.match(/[?&](?:pwd|extraction-code)=([a-zA-Z0-9]{4})/i);
+    if (pwdParamMatch && pwdParamMatch[1]) {
+      return pwdParamMatch[1];
+    }
+    
+    // 然后检查周围文本中的123盘特定格式
+    const pan123PwdMatch = surroundingText.match(/123盘.*?(?:提取码|密码|code)[：: ]\s*([a-zA-Z0-9]{4})/i);
+    if (pan123PwdMatch && pan123PwdMatch[1]) {
+      return pan123PwdMatch[1];
+    }
+  }
   
   // 在链接周围的文本中查找密码模式
   for (const pattern of PASSWORD_PATTERNS) {
