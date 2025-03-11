@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "网盘助手",
+  "name": "知链助手",
   "version": "1.0.0",
-  "description": "自动识别网页中的网盘链接和密码，并提供免密访问功能",
+  "description": "通过安装知链助手，将自动识别知链链接与共创资源链接，并提供免密访问功能",
   "icons": {
     "16": "assets/icon16.png",
     "48": "assets/icon48.png",

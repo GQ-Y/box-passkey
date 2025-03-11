@@ -66,7 +66,7 @@ let settings = {
  * 初始化弹出窗口
  */
 async function init() {
-  console.log('网盘助手弹出窗口已加载');
+  console.log('知链助手弹出窗口已加载');
   
   // 检查API模式
   const apiStatus = await checkApiMode();

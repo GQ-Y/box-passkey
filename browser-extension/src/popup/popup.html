@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>网盘助手</title>
+  <title>知链助手</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header>
       <div class="logo">
         <img src="../../assets/icon48.png" alt="网盘助手">
-        <h1>网盘助手</h1>
+        <h1>知链助手</h1>
       </div>
       <div class="user-info">
         <div id="login-status">
@@ -36,13 +36,13 @@
       <!-- 发现的链接标签页 -->
       <div id="links-tab" class="tab-pane active">
         <div class="section-header">
-          <h2>本页面发现的网盘链接</h2>
+          <h2>本页面发现的知链链接</h2>
           <span class="refresh-btn" id="refresh-links">刷新</span>
         </div>
         <div class="links-list" id="found-links">
           <div class="empty-state">
-            <p>暂未发现网盘链接</p>
-            <small>浏览包含网盘链接的网页后将自动收集</small>
+            <p>暂未发现知链链接</p>
+            <small>浏览包含知链链接的网页后将自动收集</small>
           </div>
         </div>
       </div>
@@ -56,7 +56,7 @@
         <div class="history-list" id="history-links">
           <div class="empty-state">
             <p>暂无使用历史</p>
-            <small>使用网盘链接后将显示在这里</small>
+            <small>使用知链链接后将显示在这里</small>
           </div>
         </div>
       </div>
@@ -67,8 +67,8 @@
           <h3>基本设置</h3>
           <div class="setting-item">
             <label for="auto-replace">
-              自动替换网盘链接
-              <small>将网页中的网盘链接替换为一键访问按钮</small>
+              自动替换知链链接
+              <small>将网页中的知链链接替换为一键访问按钮</small>
             </label>
             <div class="toggle">
               <input type="checkbox" id="auto-replace" checked>
@@ -78,7 +78,7 @@
           <div class="setting-item">
             <label for="auto-submit">
               自动上传发现的链接
-              <small>将发现的网盘链接和密码分享给其他用户</small>
+              <small>将发现的知链链接和密码分享给其他用户</small>
             </label>
             <div class="toggle">
               <input type="checkbox" id="auto-submit" checked>
@@ -88,7 +88,7 @@
           <div class="setting-item">
             <label for="offline-mode">
               离线模式
-              <small>直接访问网盘链接而不从服务器获取密码（不消耗积分）</small>
+              <small>直接访问知链链接而不从服务器获取密码（不消耗积分）</small>
             </label>
             <div class="toggle">
               <input type="checkbox" id="offline-mode">
